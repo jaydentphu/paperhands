@@ -6,7 +6,7 @@ from collections.abc import Iterator
 import pytest
 import sqlalchemy as sa
 from alembic.config import Config
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from alembic import command
 
@@ -45,5 +45,19 @@ def db_session(migrated_engine: sa.Engine) -> Iterator[Session]:
         yield session
     finally:
         session.close()
+        transaction.rollback()
+        connection.close()
+
+
+@pytest.fixture
+def db_session_factory(migrated_engine: sa.Engine) -> Iterator[sessionmaker[Session]]:
+    """Sessions whose commit() only releases a savepoint; everything rolls
+    back at teardown, so jobs that commit per ticker leave no residue."""
+    connection = migrated_engine.connect()
+    transaction = connection.begin()
+    factory = sessionmaker(bind=connection, join_transaction_mode="create_savepoint")
+    try:
+        yield factory
+    finally:
         transaction.rollback()
         connection.close()

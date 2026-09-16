@@ -117,7 +117,7 @@ Done when:
 
 ## Stage 2: DataGateway and adapter
 
-Status: TODO
+Status: DONE
 
 Goal: The five allowlisted read functions, one working adapter, and the snapshot job.
 

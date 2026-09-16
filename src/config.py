@@ -10,13 +10,17 @@ from __future__ import annotations
 import datetime as dt
 from decimal import Decimal
 from typing import Literal
+from zoneinfo import ZoneInfo
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 Action = Literal["long_call", "long_put", "no_trade"]
-AdapterName = Literal["robinhood", "yfinance"]
+AdapterName = Literal["robinhood", "yfinance", "fake"]
 
 WATCHLIST: tuple[str, ...] = ("AAPL", "MSFT", "NVDA", "AMZN", "GOOGL")
+
+# Headlines stored per snapshot; the agent bundle (Stage 4) shows the top 5.
+SNAPSHOT_NEWS_LIMIT: int = 10
 
 # PRD section 4 eligibility defaults.
 DTE_MIN: int = 14
@@ -69,6 +73,10 @@ NYSE_HOLIDAYS_2027: frozenset[dt.date] = frozenset(
 NYSE_HOLIDAYS: frozenset[dt.date] = NYSE_HOLIDAYS_2026 | NYSE_HOLIDAYS_2027
 
 
+def market_today() -> dt.date:
+    return dt.datetime.now(ZoneInfo(MARKET_TIMEZONE)).date()
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -76,11 +84,10 @@ class Settings(BaseSettings):
     database_url: str = ""
     runtime_model: str = "claude-sonnet-5"
 
+    # Adapter selection only. The adapter's own connection settings and
+    # credentials are read from env inside src/gateway/adapters/ (CLAUDE.md
+    # rule 3), never surfaced here.
     adapter: AdapterName = "robinhood"
-    robinhood_mcp_url: str = "https://agent.robinhood.com/mcp/trading"
-    robinhood_token_path: str = ""
-
-    yfinance_enabled: bool = False
 
 
 def get_settings() -> Settings:
