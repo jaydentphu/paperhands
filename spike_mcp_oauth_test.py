@@ -140,27 +140,29 @@ async def main() -> None:
 
     try:
         print(f"[spike] connecting to {server_url} ...")
-        async with httpx2.AsyncClient(auth=oauth_auth) as client:
-            async with streamable_http_client(url=server_url, http_client=client) as (
+        async with (
+            httpx2.AsyncClient(auth=oauth_auth) as client,
+            streamable_http_client(url=server_url, http_client=client) as (
                 read_stream,
                 write_stream,
-            ):
-                async with ClientSession(read_stream, write_stream) as session:
-                    await session.initialize()
-                    print("[spike] session initialized")
+            ),
+            ClientSession(read_stream, write_stream) as session,
+        ):
+            await session.initialize()
+            print("[spike] session initialized")
 
-                    tools = await session.list_tools()
-                    print(f"[spike] {len(tools.tools)} tools available:")
-                    for tool in tools.tools:
-                        print(f"  - {tool.name}")
+            tools = await session.list_tools()
+            print(f"[spike] {len(tools.tools)} tools available:")
+            for tool in tools.tools:
+                print(f"  - {tool.name}")
 
-                    if not any(t.name == "get_equity_quotes" for t in tools.tools):
-                        print("[spike] WARNING: get_equity_quotes not in tool list, trying anyway")
+            if not any(t.name == "get_equity_quotes" for t in tools.tools):
+                print("[spike] WARNING: get_equity_quotes not in tool list, trying anyway")
 
-                    result = await session.call_tool("get_equity_quotes", {"symbols": ["AAPL"]})
-                    print("[spike] get_equity_quotes result:")
-                    for content in result.content:
-                        print(getattr(content, "text", content))
+            result = await session.call_tool("get_equity_quotes", {"symbols": ["AAPL"]})
+            print("[spike] get_equity_quotes result:")
+            for content in result.content:
+                print(getattr(content, "text", content))
     finally:
         httpd.shutdown()
 

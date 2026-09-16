@@ -48,7 +48,7 @@ Write a single-file Python script using the official mcp Python SDK that connect
 
 ## Stage 0b: Repo scaffold and Docker (Claude Code scaffolds; Jayden writes the Dockerfiles)
 
-Status: TODO
+Status: IN PROGRESS (scaffold done and checked; awaiting Docker Desktop + make install and the three Dockerfiles)
 
 Goal: An empty but running project. Four Compose services come up healthy. CI runs and passes on a trivial test.
 
