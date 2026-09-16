@@ -2,30 +2,60 @@
 
 Status values: TODO, IN PROGRESS, DONE, BLOCKED. Claude Code updates these. Jayden owns Stage 0a and the Dockerfiles in Stage 0b, and reviews every file in Stage 8.
 
-## Kickoff prompt (paste as your first message in Claude Code)
+## Model per stage — read this before sending anything
+
+Stages alternate models, and Claude Code cannot switch its own model mid-session. Check `/model` before each stage below and switch if the row doesn't match what's currently selected.
+
+| Stage | Model | Send as |
+|---|---|---|
+| 0a | — (you, no Claude Code) | manual |
+| 0b | Sonnet 5 | kickoff prompt |
+| 1 | Sonnet 5 | single-stage prompt |
+| 2 | **Fable 5.1** | single-stage prompt |
+| 3 | Sonnet 5 | single-stage prompt |
+| 4 | **Fable 5.1** | single-stage prompt |
+| 5 | Sonnet 5 | single-stage prompt |
+| 6 | **Fable 5.1** | single-stage prompt |
+| 7 | Sonnet 5 | single-stage prompt |
+| 8a, 8b (all 4 views) | Sonnet 5 | chained loop prompt (one model throughout, so this one can batch) |
+| 9 | **Fable 5.1** | single-stage prompt |
+| Saturday wrap-up | **Fable 5.1** | single-stage prompt |
+
+First, confirm Fable actually appears in `/model` inside Claude Code, or that `claude --model claude-fable-5-1` is accepted. If neither works, your credits may only apply in the claude.ai chat interface, not Claude Code — check your account before relying on this table, and if Fable isn't reachable from Claude Code, run everything on Sonnet 5 and skip the switches below.
+
+Because stages 1 through 7 alternate models almost every step, there is no single unattended overnight run across that whole range. Send each stage as its own message, from the "## Stage N" section below, switching model right before stages 2, 4, and 6. You're reviewing every diff per CLAUDE.md rule 9 anyway, so sending one stage at a time costs you nothing.
+
+## How to send a stage
+
+Copy the exact text inside the code block under that stage's "## Stage N" heading below, and paste it as your message. That's it, that block is the prompt. Before pasting it, check `/model` against the table above and switch if needed.
+
+The kickoff prompt below is the one exception, since it's what starts the whole session. After that, every stage's prompt lives under its own heading further down in this file.
+
+## Kickoff prompt (paste as your first message in Claude Code, model: Sonnet 5)
+
+Send this only after you've done Stage 0a yourself and written the ADAPTER line in NOTES.md.
 
 ```
-Read SETUP.md, PRD.md, CLAUDE.md, and BUILD_STAGES.md in full. Then start Stage 0a.
+Read SETUP.md, PRD.md, CLAUDE.md, and BUILD_STAGES.md in full. Stage 0a is already done — check NOTES.md for the ADAPTER decision. Start Stage 0b.
 
 Loop rules for this session:
 - Work on the first stage marked TODO or IN PROGRESS.
 - A stage is DONE only when every item under its "Done when" list has been run and passed. Paste the output.
-- After marking a stage DONE and committing, move to the next stage without asking, unless the next stage is marked "Jayden writes this" or you have hit a blocker.
-- Stop before Stage 8 and wait (Jayden adds design files first).
+- Stage 0b ends with a question for me about the Dockerfiles — stop there and wait.
 - If blocked three times on the same problem, write BLOCKED.md, commit, and stop.
 Begin.
 ```
 
-## Overnight loop prompt (Wed night, after Stage 0 is done)
+## Chained loop prompt (Stage 8 only — one model throughout, so this one can run several steps unattended)
 
 ```
-Continue from the first stage not marked DONE in BUILD_STAGES.md. Same loop rules as before. Run Stages 1 through 7 in order. Do not touch frontend/ yet. Stop when Stage 7 is DONE or when blocked. Do not ask me questions; if you need a decision, choose the simpler option, write it in NOTES.md, and continue.
+Continue from BUILD_STAGES.md. Run Stage 8a, then Stage 8b for Today, then Positions, then Scoreboard, then Logs, in that order, using the prompts under "## Stage 8" in that file. Stop after Stage 8a and after each Stage 8b view and wait for me before continuing — I'm reviewing and making a change by hand between each one. If blocked three times on the same problem, write BLOCKED.md, commit, and stop.
 ```
 
-## Resume prompt (any later session)
+## Resume prompt (any later session — use only if you're unsure where you left off)
 
 ```
-Read BUILD_STAGES.md and NOTES.md. Check for BLOCKED.md. Continue from the first stage not marked DONE, same loop rules.
+Read BUILD_STAGES.md and NOTES.md. Check for BLOCKED.md. Tell me which stage is next and what model it needs per the table at the top of BUILD_STAGES.md. Do not start it — wait for me to confirm the model is switched and paste that stage's own prompt.
 ```
 
 ---
@@ -191,7 +221,7 @@ Done when:
 - `docker compose up` shows the worker logging the next scheduled run time.
 - `make check` passes.
 
-STOP HERE. Before Stage 8, Jayden adds the Claude Design exports to docs/design/.
+STOP HERE. Before Stage 8, Jayden adds the Claude Design exports to docs/design/, and confirms the model is set to Sonnet 5.
 
 ## Stage 8: Dashboard (Claude Code builds, Jayden reviews every file)
 
@@ -243,7 +273,7 @@ Done when:
 - README exists and you have read it and agree with every sentence.
 - The review reports no violations, or you have fixed the ones it found.
 
-## Saturday wrap-up prompt (remaining credits)
+## Saturday wrap-up prompt (remaining credits, model: Fable 5.1)
 
 ```
 Read the whole repository. Produce three things in NOTES.md: (1) a list of the ten questions an interviewer would most likely ask about this codebase, each with the file and line that answers it; (2) a list of every place where a Phase 3 ExecutionGateway would need to plug in, without writing any of it; (3) the five most likely bugs in the daily run based on reading the code, ranked. Do not change any code.
