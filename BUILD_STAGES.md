@@ -32,7 +32,7 @@ Read BUILD_STAGES.md and NOTES.md. Check for BLOCKED.md. Continue from the first
 
 ## Stage 0a: Data spike (Jayden, 30 minutes max, before Claude Code)
 
-Status: TODO
+Status: DONE
 
 Goal: Decide the Phase 1 data adapter.
 
