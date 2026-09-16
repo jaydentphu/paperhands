@@ -57,15 +57,15 @@ Each stage in BUILD_STAGES.md has:
 
 Claude Code marks a stage DONE in BUILD_STAGES.md only after every "Done when" item is verified by actually running it. If it cannot finish, it writes BLOCKED.md with what it tried and stops. That is your signal to step in.
 
-Overnight loop (Stages 1 through 7 are chained): the kickoff prompt tells it to proceed to the next stage automatically after committing a completed one. It stops before Stage 8 so you can drop the design mockups into docs/design/ first. Run the overnight loop Wednesday night, review Thursday morning.
+Model per stage: BUILD_STAGES.md has a table at the top mapping each stage to Sonnet 5 or Fable 5.1. Stages 1 through 7 alternate models almost every step, so they're sent one at a time with the single-stage prompt, switching `/model` right before Stages 2, 4, and 6. Stage 8 is the one stretch that runs on a single model (Sonnet 5) throughout, so that's the one you can hand off as a short chained loop, stopping after each view for your review.
 
 ## Suggested schedule
 
 | Day | What | Hours |
 |---|---|---|
-| Tue night | Read all four files. Confirm credits and API key. Install Docker/Node. | 1 |
-| Wed | Stage 0 spike (30 min), then Stage 0 scaffold with Claude Code. Write Dockerfiles yourself. Start the overnight loop for Stages 1 to 4. | 3 |
-| Thu | Review Stages 1 to 4. Fix anything blocked. Run Stages 5 to 7 in the afternoon. | 3 |
+| Tue night | Read all four files. Confirm credits and API key. Confirm Fable is reachable from Claude Code. Install Docker/Node. | 1 |
+| Wed | Stage 0 spike (30 min), then Stage 0b scaffold with Claude Code. Write Dockerfiles yourself. Send Stages 1 through 4 one at a time, switching model before 2 and 4. | 3 |
+| Thu | Send Stages 5 through 7 one at a time, switching model before 6. Fix anything blocked. | 3 |
 | Thu night | Design in Claude Design, export to docs/design/, run Stage 8a and the Today view. | 2 |
 | Fri | Remaining three views with review after each. Stage 9 CI hardening. First real scheduled run. Read the agent's output. | 3 |
 | Sat | Second real run. Fix what the first run exposed. Use remaining credits on code review, README, and the resume writeup draft. | 3 |

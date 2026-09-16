@@ -100,7 +100,7 @@ Done when:
 
 ## Stage 1: Schema and models
 
-Status: TODO
+Status: DONE
 
 Goal: Postgres schema for the entire Phase 1 pipeline, with Alembic migrations.
 
