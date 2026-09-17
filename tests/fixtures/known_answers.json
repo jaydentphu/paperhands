@@ -1,0 +1,127 @@
+{
+  "_readme": [
+    "A synthetic March 2026 (22 trading days, no NYSE holidays) for three cohorts on two tickers.",
+    "Every value under 'expected' was computed by hand from the 'trades' table below. Two to check with a calculator:",
+    "  B total_pnl  = (3.30-2.50)*100 + (1.40-2.20)*100 + (2.50-2.40)*100 = 80 - 80 + 10 = 10.00",
+    "  C max_drawdown: cumulative P&L in close order is +40, -70, +20 -> peak 40, trough -70 -> 110.00",
+    "Prices: each ticker/contract has a default and per-date overrides. Fill happens at that day's ask,",
+    "marks/closes at that day's bid. Horizon is 5 trading days, so a trade opened day N closes day N+5.",
+    "Decisions not listed are no_trade (accepted). Cohort A is no_trade every day. 22 days x 2 tickers = 44 decisions per cohort."
+  ],
+  "start": "2026-03-02",
+  "end": "2026-03-31",
+  "tickers": ["AAPL", "MSFT"],
+  "underlying": {
+    "AAPL": {
+      "default": "200.00",
+      "overrides": {
+        "2026-03-03": "201.00",
+        "2026-03-09": "206.00",
+        "2026-03-10": "205.00",
+        "2026-03-16": "204.00",
+        "2026-03-23": "204.50"
+      }
+    },
+    "MSFT": {
+      "default": "400.00",
+      "overrides": {
+        "2026-03-05": "399.00",
+        "2026-03-11": "404.00",
+        "2026-03-12": "405.00",
+        "2026-03-17": "402.00",
+        "2026-03-24": "396.00"
+      }
+    }
+  },
+  "contracts": [
+    {
+      "contract_id": "A1", "ticker": "AAPL", "contract_type": "call", "strike": "200", "expiry": "2026-04-10",
+      "open_interest": 1000,
+      "default": {"bid": "2.40", "ask": "2.50"},
+      "overrides": {
+        "2026-03-03": {"bid": "2.60", "ask": "2.70"},
+        "2026-03-09": {"bid": "3.30", "ask": "3.40"},
+        "2026-03-10": {"bid": "3.10", "ask": "3.20"}
+      }
+    },
+    {
+      "contract_id": "A2", "ticker": "AAPL", "contract_type": "call", "strike": "205", "expiry": "2026-04-24",
+      "open_interest": 1000,
+      "default": {"bid": "2.30", "ask": "2.40"},
+      "overrides": {
+        "2026-03-23": {"bid": "2.50", "ask": "2.60"}
+      }
+    },
+    {
+      "contract_id": "M1", "ticker": "MSFT", "contract_type": "put", "strike": "400", "expiry": "2026-04-10",
+      "open_interest": 1000,
+      "default": {"bid": "2.10", "ask": "2.20"},
+      "overrides": {
+        "2026-03-05": {"bid": "2.20", "ask": "2.30"},
+        "2026-03-11": {"bid": "1.40", "ask": "1.50"},
+        "2026-03-12": {"bid": "1.20", "ask": "1.30"}
+      }
+    },
+    {
+      "contract_id": "M2", "ticker": "MSFT", "contract_type": "put", "strike": "400", "expiry": "2026-04-24",
+      "open_interest": 1000,
+      "default": {"bid": "2.50", "ask": "2.60"},
+      "overrides": {
+        "2026-03-24": {"bid": "3.50", "ask": "3.60"},
+        "2026-03-25": {"bid": "2.00", "ask": "2.30"}
+      }
+    }
+  ],
+  "decisions": [
+    {"date": "2026-03-02", "cohort": "B", "ticker": "AAPL", "action": "long_call", "contract_id": "A1"},
+    {"date": "2026-03-03", "cohort": "C", "ticker": "AAPL", "action": "long_call", "contract_id": "A1"},
+    {"date": "2026-03-04", "cohort": "B", "ticker": "MSFT", "action": "long_put", "contract_id": "M1"},
+    {"date": "2026-03-05", "cohort": "C", "ticker": "MSFT", "action": "long_put", "contract_id": "M1"},
+    {"date": "2026-03-16", "cohort": "B", "ticker": "AAPL", "action": "long_call", "contract_id": "A2"},
+    {"date": "2026-03-17", "cohort": "C", "ticker": "MSFT", "action": "long_put", "contract_id": "M2"},
+    {"date": "2026-03-20", "cohort": "C", "ticker": "AAPL", "action": "no_trade", "contract_id": null,
+     "validator_status": "rejected", "rejection_reason": "schema_invalid"},
+    {"date": "2026-03-25", "cohort": "B", "ticker": "MSFT", "action": "long_put", "contract_id": "M2",
+     "_note": "accepted decision, but M2's spread that day is 0.30/2.15 = 14% -> fill rejected: spread_too_wide"}
+  ],
+  "trades": [
+    {"cohort": "B", "ticker": "AAPL", "contract_id": "A1", "opened": "2026-03-02", "closed": "2026-03-09",
+     "open_price": "2.50", "close_price": "3.30", "underlying_open": "200.00", "underlying_close": "206.00",
+     "realized_pnl": "80.00", "direction_correct": true, "horizon_days": 5},
+    {"cohort": "C", "ticker": "AAPL", "contract_id": "A1", "opened": "2026-03-03", "closed": "2026-03-10",
+     "open_price": "2.70", "close_price": "3.10", "underlying_open": "201.00", "underlying_close": "205.00",
+     "realized_pnl": "40.00", "direction_correct": true, "horizon_days": 5},
+    {"cohort": "B", "ticker": "MSFT", "contract_id": "M1", "opened": "2026-03-04", "closed": "2026-03-11",
+     "open_price": "2.20", "close_price": "1.40", "underlying_open": "400.00", "underlying_close": "404.00",
+     "realized_pnl": "-80.00", "direction_correct": false, "horizon_days": 5},
+    {"cohort": "C", "ticker": "MSFT", "contract_id": "M1", "opened": "2026-03-05", "closed": "2026-03-12",
+     "open_price": "2.30", "close_price": "1.20", "underlying_open": "399.00", "underlying_close": "405.00",
+     "realized_pnl": "-110.00", "direction_correct": false, "horizon_days": 5},
+    {"cohort": "B", "ticker": "AAPL", "contract_id": "A2", "opened": "2026-03-16", "closed": "2026-03-23",
+     "open_price": "2.40", "close_price": "2.50", "underlying_open": "204.00", "underlying_close": "204.50",
+     "realized_pnl": "10.00", "direction_correct": true, "horizon_days": 5},
+    {"cohort": "C", "ticker": "MSFT", "contract_id": "M2", "opened": "2026-03-17", "closed": "2026-03-24",
+     "open_price": "2.60", "close_price": "3.50", "underlying_open": "402.00", "underlying_close": "396.00",
+     "realized_pnl": "90.00", "direction_correct": true, "horizon_days": 5}
+  ],
+  "unfilled": [
+    {"date": "2026-03-25", "cohort": "B", "ticker": "MSFT", "reason": "spread_too_wide"}
+  ],
+  "expected": {
+    "A": {
+      "decisions": 44, "no_trade_count": 44, "trades": 0,
+      "hit_rate": "0", "mean_pnl": "0", "median_pnl": "0", "total_pnl": "0",
+      "max_drawdown": "0", "pnl_vs_cash": "0"
+    },
+    "B": {
+      "decisions": 44, "no_trade_count": 40, "trades": 3,
+      "hit_rate": "0.6667", "mean_pnl": "3.33", "median_pnl": "10.00", "total_pnl": "10.00",
+      "max_drawdown": "80.00", "pnl_vs_cash": "10.00"
+    },
+    "C": {
+      "decisions": 44, "no_trade_count": 41, "trades": 3,
+      "hit_rate": "0.6667", "mean_pnl": "6.67", "median_pnl": "40.00", "total_pnl": "20.00",
+      "max_drawdown": "110.00", "pnl_vs_cash": "20.00"
+    }
+  }
+}

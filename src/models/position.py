@@ -25,6 +25,11 @@ class PaperPosition(Base):
     expiry: Mapped[dt.date] = mapped_column(Date, nullable=False)
     opened_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     open_price: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
+    # Underlying's last price at fill and at close (Stage 6): the evaluator's
+    # direction_correct compares these two numbers, so they are captured by
+    # code at the moment they happen rather than reconstructed later.
+    underlying_open: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
+    underlying_close: Mapped[Decimal | None] = mapped_column(Numeric(12, 4), nullable=True)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default="1")
     max_loss: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
     status: Mapped[PositionStatus] = mapped_column(

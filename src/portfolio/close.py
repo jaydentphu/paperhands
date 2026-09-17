@@ -1,18 +1,20 @@
 """close_positions: closes any open position that has reached HORIZON_DAYS
 trading days since it opened, or is within 2 trading days of its own
 expiry, at the current bid (zero if missing). Horizon is checked first;
-pre_expiry is a safety net for whatever slips past it.
+pre_expiry is a safety net for whatever slips past it. The underlying's
+last price is captured at the same moment for the evaluator.
 """
 
 from __future__ import annotations
 
 import datetime as dt
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.config import HORIZON_DAYS, trading_days_between
+from src.config import HORIZON_DAYS, MARK_TIME, MARKET_TIMEZONE, trading_days_between
 from src.gateway import DataGateway
 from src.gateway.types import OptionContract
 from src.models import Decision, PaperPosition
@@ -39,6 +41,7 @@ def close_positions(session: Session, gateway: DataGateway, date: dt.date) -> in
     ).all()
 
     chains: dict[str, dict[str, OptionContract]] = {}
+    underlying: dict[str, Decimal] = {}
     closed = 0
     for position, ticker in rows:
         reason = _close_reason(position, date)
@@ -47,12 +50,16 @@ def close_positions(session: Session, gateway: DataGateway, date: dt.date) -> in
 
         if ticker not in chains:
             chains[ticker] = fetch_chain_lookup(gateway, ticker)
+            underlying[ticker] = gateway.get_quote(ticker).last
         contract = chains[ticker].get(position.contract_id)
         close_price = contract.bid if contract is not None else Decimal("0")
 
         position.status = PositionStatus.CLOSED
-        position.closed_at = dt.datetime.now(dt.UTC)
+        position.closed_at = dt.datetime.combine(
+            date, MARK_TIME, tzinfo=ZoneInfo(MARKET_TIMEZONE)
+        )
         position.close_price = close_price
+        position.underlying_close = underlying[ticker]
         position.close_reason = reason
         closed += 1
 

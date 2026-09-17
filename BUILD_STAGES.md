@@ -187,7 +187,7 @@ Done when:
 
 ## Stage 6: Evaluator
 
-Status: TODO
+Status: DONE
 
 Goal: Scoring per position and per cohort, tested on known-answer fixtures.
 

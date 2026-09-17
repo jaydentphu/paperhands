@@ -34,7 +34,15 @@ class StubAdapter:
         self._chain = chain
 
     def get_quote(self, ticker: str) -> Quote:
-        raise NotImplementedError
+        last = Decimal("150.00")
+        return Quote(
+            ticker=ticker,
+            last=last,
+            bid=last,
+            ask=last,
+            previous_close=last,
+            as_of=dt.datetime.combine(TODAY, dt.time(10, 30), tzinfo=dt.UTC),
+        )
 
     def get_option_chain(self, ticker: str, min_dte: int, max_dte: int) -> list[OptionContract]:
         return self._chain

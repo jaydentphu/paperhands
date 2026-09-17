@@ -37,7 +37,15 @@ class StubAdapter:
         self._chain_by_ticker = chain_by_ticker
 
     def get_quote(self, ticker: str) -> Quote:
-        raise NotImplementedError
+        last = Decimal("200.00")
+        return Quote(
+            ticker=ticker,
+            last=last,
+            bid=last,
+            ask=last,
+            previous_close=last,
+            as_of=dt.datetime.combine(OPENED, dt.time(10, 30), tzinfo=dt.UTC),
+        )
 
     def get_option_chain(self, ticker: str, min_dte: int, max_dte: int) -> list[OptionContract]:
         return self._chain_by_ticker.get(ticker, [])
@@ -101,6 +109,7 @@ def _seed_position(
         expiry=expiry,
         opened_at=dt.datetime.combine(opened_at, dt.time(16, 15), tzinfo=dt.UTC),
         open_price=Decimal("2.00"),
+        underlying_open=Decimal("200.00"),
         quantity=1,
         max_loss=Decimal("200.00"),
         status=PositionStatus.OPEN,

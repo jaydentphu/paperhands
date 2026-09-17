@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import datetime as dt
 from dataclasses import dataclass
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.config import market_today
+from src.config import MARKET_TIMEZONE, RUN_TIME, market_today
 from src.gateway import DataGateway
 from src.models import Decision, PaperPosition
 from src.models.enums import Action, ContractType, PositionStatus
@@ -86,13 +87,17 @@ def open_position(
         assert reason is not None
         return Rejected(reason)
 
+    underlying = gateway.get_quote(decision.ticker).last
     position = PaperPosition(
         cohort=decision.cohort,
         decision_id=decision.id,
         contract_id=contract.contract_id,
         expiry=contract.expiry,
-        opened_at=dt.datetime.now(dt.UTC),
+        # Stamped with the run date, not wall-clock now, so a simulated or
+        # re-run day records the day it belongs to.
+        opened_at=dt.datetime.combine(as_of, RUN_TIME, tzinfo=ZoneInfo(MARKET_TIMEZONE)),
         open_price=contract.ask,
+        underlying_open=underlying,
         quantity=1,
         max_loss=contract.ask * 100,
         status=PositionStatus.OPEN,
