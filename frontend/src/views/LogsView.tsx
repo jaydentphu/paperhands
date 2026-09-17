@@ -1,5 +1,5 @@
 /** Placeholder - built in Stage 8b. Design reference: the `isLogs`
- * sc-if section of docs/design/Paper Hands.dc.html. */
+ * sc-if section of docs/design/Paperhands.dc.html. */
 export function LogsView() {
   return (
     <div className="view-placeholder">

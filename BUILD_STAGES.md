@@ -229,18 +229,18 @@ Status: IN PROGRESS
 
 Goal: React + TypeScript + Vite app with four views reading from the five API endpoints, matching the design in docs/design/.
 
-**Deviation from the original plan (see NOTES.md for the full note):** Jayden did not export four PNGs + a separate STYLE_GUIDE.md. What actually exists in docs/design/ is a single Claude Design canvas export, `Paper Hands.dc.html`, containing all four views (Today, Positions, Scoreboard, Logs) plus a fifth "Style guide" reference page as tabs within one file, alongside `support.js` (the canvas runtime, not a design artifact) and `uploads/` (a pasted reference image). `docs/design/STYLE_GUIDE.md` was written by transcribing that canvas's own embedded `:root` tokens, type scale, and glass/chrome CSS comments directly - not re-derived by eye. The four views below are read directly from the canvas's four `sc-if` sections instead of from PNGs.
+**Deviation from the original plan (see NOTES.md for the full note):** Jayden did not export four PNGs + a separate STYLE_GUIDE.md. What actually exists in docs/design/ is a single Claude Design canvas export, `Paperhands.dc.html`, containing all four views (Today, Positions, Scoreboard, Logs) plus a fifth "Style guide" reference page as tabs within one file, alongside `support.js` (the canvas runtime, not a design artifact) and `uploads/` (a pasted reference image). `docs/design/STYLE_GUIDE.md` was written by transcribing that canvas's own embedded `:root` tokens, type scale, and glass/chrome CSS comments directly - not re-derived by eye. The four views below are read directly from the canvas's four `sc-if` sections instead of from PNGs.
 
 Before starting: N/A - the design file is already in docs/design/, committed.
 
 Prompt 8a (foundation):
 ```
-Stage 8a. Read docs/design/STYLE_GUIDE.md and docs/design/Paper Hands.dc.html (the four dashboard views live in that single canvas file's Today/Positions/Scoreboard/Logs sc-if sections - there are no separate PNGs). Scaffold frontend/ with Vite, React 18, and TypeScript in strict mode. Create src/theme/tokens.css with the color, radius, blur, and type tokens from the style guide as CSS variables. Create typed API interfaces in src/api/types.ts that exactly match the response models in the backend's src/api/schemas.py, and a small typed fetch client in src/api/client.ts. No UI library, no state library, no CSS framework. Build the app shell only: top bar, navigation, and routing for the four views with empty placeholders. Then stop and list every file you created with one line on what it does.
+Stage 8a. Read docs/design/STYLE_GUIDE.md and docs/design/Paperhands.dc.html (the four dashboard views live in that single canvas file's Today/Positions/Scoreboard/Logs sc-if sections - there are no separate PNGs). Scaffold frontend/ with Vite, React 18, and TypeScript in strict mode. Create src/theme/tokens.css with the color, radius, blur, and type tokens from the style guide as CSS variables. Create typed API interfaces in src/api/types.ts that exactly match the response models in the backend's src/api/schemas.py, and a small typed fetch client in src/api/client.ts. No UI library, no state library, no CSS framework. Build the app shell only: top bar, navigation, and routing for the four views with empty placeholders. Then stop and list every file you created with one line on what it does.
 ```
 
 Prompt 8b (one view per loop, repeat for Today, Positions, Scoreboard, Logs in that order):
 ```
-Stage 8b, view: <NAME>. Read the <NAME> sc-if section of docs/design/Paper Hands.dc.html for layout/structure and the Component class's renderVals() for exactly which pieces of state map to which rendered elements. Build this view against the live API using the tokens in tokens.css and the types in types.ts - the canvas's own sample data (TICKERS, POS_OPEN, LOGS, etc.) is placeholder only; map real fields from src/api/types.ts onto the same visual structure, and where a real field doesn't exist yet (noted per-view in NOTES.md), say so and pick the simplest reasonable substitute rather than inventing fake data. Split it into small components, each under 150 lines. Glass and chrome effects must follow the style guide spec exactly and must not reduce text contrast. Handle loading, empty, and error states. When done, run npm run build, fix all TypeScript errors, and stop. Do not start the next view.
+Stage 8b, view: <NAME>. Read the <NAME> sc-if section of docs/design/Paperhands.dc.html for layout/structure and the Component class's renderVals() for exactly which pieces of state map to which rendered elements. Build this view against the live API using the tokens in tokens.css and the types in types.ts - the canvas's own sample data (TICKERS, POS_OPEN, LOGS, etc.) is placeholder only; map real fields from src/api/types.ts onto the same visual structure, and where a real field doesn't exist yet (noted per-view in NOTES.md), say so and pick the simplest reasonable substitute rather than inventing fake data. Split it into small components, each under 150 lines. Glass and chrome effects must follow the style guide spec exactly and must not reduce text contrast. Handle loading, empty, and error states. When done, run npm run build, fix all TypeScript errors, and stop. Do not start the next view.
 ```
 
 Your job after each 8b loop (this is the part that makes the TypeScript real):
@@ -251,7 +251,7 @@ Explain <file> to me line by line, focusing on the TypeScript: what each type do
 2. Make at least one change yourself per view, by hand, before moving on. Rename a prop, add a column, change a type, fix a layout detail. Then ask Claude Code to review your change without rewriting it.
 3. Compare against the design:
 ```
-Open docs/design/Paper Hands.dc.html to the <NAME> tab and compare it to the running page at http://localhost:5173/<route>. List visual differences, most important first. Do not fix them yet.
+Open docs/design/Paperhands.dc.html to the <NAME> tab and compare it to the running page at http://localhost:5173/<route>. List visual differences, most important first. Do not fix them yet.
 ```
 
 Done when:

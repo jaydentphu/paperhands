@@ -11,7 +11,7 @@ export function TopBar() {
         <div className="top-bar__mark" aria-hidden="true">
           <div className="top-bar__mark-cut" />
         </div>
-        <div className="top-bar__title">Paper Hands</div>
+        <div className="top-bar__title">Paperhands</div>
       </div>
 
       <div className="top-bar__search" aria-hidden="true">

@@ -1,6 +1,6 @@
-# Paper Hands — Style Guide
+# Paperhands — Style Guide
 
-Transcribed from `docs/design/Paper Hands.dc.html` (a Claude Design canvas
+Transcribed from `docs/design/Paperhands.dc.html` (a Claude Design canvas
 containing all four dashboard views plus a "Style guide" reference page).
 Every value below is copied from that canvas's own `:root` block, type
 scale, and glass/chrome CSS comments — not eyeballed from a screenshot.
