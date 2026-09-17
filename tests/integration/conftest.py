@@ -16,8 +16,11 @@ DATABASE_URL = os.environ.get(
 
 
 def _postgres_reachable() -> bool:
+    # A short connect_timeout matters: without one, a dead/unreachable
+    # Postgres can make this hang the whole suite for minutes instead of
+    # skipping cleanly, which defeats the point of a reachability check.
     try:
-        engine = sa.create_engine(DATABASE_URL)
+        engine = sa.create_engine(DATABASE_URL, connect_args={"connect_timeout": 3})
         with engine.connect():
             return True
     except Exception:

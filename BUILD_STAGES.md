@@ -135,7 +135,7 @@ Your job: open allowlist.py and the gateway file and read every line. You will b
 
 ## Stage 3: Eligibility filter, validator, and Cohort B screener
 
-Status: TODO
+Status: DONE
 
 Goal: Everything deterministic that sits between data and a decision.
 
