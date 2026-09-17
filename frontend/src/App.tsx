@@ -4,7 +4,7 @@ import { RouterProvider, useRouter } from './router';
 import { LogsView } from './views/LogsView';
 import { PositionsView } from './views/PositionsView';
 import { ScoreboardView } from './views/ScoreboardView';
-import { TodayView } from './views/TodayView';
+import { TodayView } from './views/today/TodayView';
 
 function CurrentView() {
   const { route } = useRouter();
