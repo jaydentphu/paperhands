@@ -152,7 +152,7 @@ Done when:
 
 ## Stage 4: Research agent (Cohort C)
 
-Status: TODO
+Status: DONE
 
 Goal: The LLM produces a valid TradeCandidate from a context bundle, or is rejected and logged.
 

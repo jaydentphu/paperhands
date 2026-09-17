@@ -9,9 +9,16 @@ run-time context - watchlist membership, contract eligibility, action vs.
 contract type, the max-loss cap - are src/validator/candidate.py's job
 (CLAUDE.md rule 4: the agent never computes money, and never decides
 eligibility either).
+
+OUTPUT_SCHEMA is the JSON schema handed to the API's structured-output
+format. It is written by hand, restricted to the keywords structured
+outputs supports (no min/max lengths or numeric bounds), and kept in sync
+with the model by a test. The Pydantic model remains the enforcement point.
 """
 
 from __future__ import annotations
+
+from typing import Any, Final
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -36,3 +43,29 @@ class TradeCandidate(BaseModel):
         elif self.contract_id is None:
             raise ValueError("contract_id is required when action is long_call or long_put")
         return self
+
+
+OUTPUT_SCHEMA: Final[dict[str, Any]] = {
+    "type": "object",
+    "properties": {
+        "ticker": {"type": "string"},
+        "action": {"type": "string", "enum": [a.value for a in Action]},
+        "contract_id": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+        "thesis": {"type": "string"},
+        "evidence_for": {"type": "array", "items": {"type": "string"}},
+        "evidence_against": {"type": "array", "items": {"type": "string"}},
+        "confidence": {"type": "number"},
+        "invalidation": {"type": "string"},
+    },
+    "required": [
+        "ticker",
+        "action",
+        "contract_id",
+        "thesis",
+        "evidence_for",
+        "evidence_against",
+        "confidence",
+        "invalidation",
+    ],
+    "additionalProperties": False,
+}

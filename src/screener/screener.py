@@ -1,13 +1,17 @@
 """Cohort B: a documented, deterministic rule set.
 
-Rule (thresholds are a build-time choice, not from the PRD - see NOTES.md):
-  bullish  if 20-day return > +2% AND 14-day RSI > 55  -> long_call
-  bearish  if 20-day return < -2% AND 14-day RSI < 45  -> long_put
+Rule (thresholds are a build-time choice, not from the PRD - see NOTES.md
+Stage 4 "Strategy v1 revision" for the tuning rationale):
+  bullish  if 20-day return > +3% AND 14-day RSI > 55  -> long_call
+  bearish  if 20-day return < -3% AND 14-day RSI < 45  -> long_put
   otherwise                                             -> no_trade
 
 Contract selection, when a direction is chosen: among eligible contracts of
-the matching type, pick the one closest to 30 DTE, breaking ties by
-closeness to at-the-money.
+the matching type AND within MONEYNESS_CAP_PCT of the spot price, pick the
+one closest to TARGET_DTE, breaking ties by closeness to at-the-money. If
+nothing is within the moneyness cap, the result is no_trade - the strike is
+never allowed to drift OTM just because a cheaper contract happens to
+satisfy the eligibility filter's premium cap.
 """
 
 from __future__ import annotations
@@ -21,11 +25,12 @@ from src.models import ContractSnapshot
 from src.models.enums import Action, ContractType
 from src.screener.indicators import rsi_14, twenty_day_return
 
-BULLISH_RETURN = Decimal("0.02")
-BEARISH_RETURN = Decimal("-0.02")
+BULLISH_RETURN = Decimal("0.03")
+BEARISH_RETURN = Decimal("-0.03")
 BULLISH_RSI = Decimal(55)
 BEARISH_RSI = Decimal(45)
-TARGET_DTE = 30
+TARGET_DTE = 35
+MONEYNESS_CAP_PCT = Decimal("0.02")
 
 _ACTION_CONTRACT_TYPE = {
     Action.LONG_CALL: ContractType.CALL,
@@ -56,7 +61,12 @@ def screen(
         return ScreenerDecision(Action.NO_TRADE, None)
 
     wanted_type = _ACTION_CONTRACT_TYPE[action]
-    candidates = [c for c in eligible_contracts if c.contract_type == wanted_type]
+    max_distance = spot * MONEYNESS_CAP_PCT
+    candidates = [
+        c
+        for c in eligible_contracts
+        if c.contract_type == wanted_type and abs(c.strike - spot) <= max_distance
+    ]
     if not candidates:
         return ScreenerDecision(Action.NO_TRADE, None)
 

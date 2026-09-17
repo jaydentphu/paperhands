@@ -22,10 +22,16 @@ WATCHLIST: tuple[str, ...] = ("AAPL", "MSFT", "NVDA", "AMZN", "GOOGL")
 # Headlines stored per snapshot; the agent bundle (Stage 4) shows the top 5.
 SNAPSHOT_NEWS_LIMIT: int = 10
 
-# PRD section 4 eligibility defaults.
-DTE_MIN: int = 14
+# PRD section 4 eligibility defaults. DTE_MIN and MAX_SPREAD_PCT were tuned
+# from the PRD's own defaults (14, 0.10) after a v1-strategy review - see
+# NOTES.md Stage 4 "Strategy v1 revision". A 5-day hold starting near 14 DTE
+# can finish with about a week left, where time decay accelerates; 28-45
+# keeps the whole hold inside the slower-decay part of the option's life.
+# 5% (down from 10%) reflects that a 5-day trade can't absorb a wide spread
+# and still show a real signal.
+DTE_MIN: int = 28
 DTE_MAX: int = 45
-MAX_SPREAD_PCT: Decimal = Decimal("0.10")
+MAX_SPREAD_PCT: Decimal = Decimal("0.05")
 MIN_OPEN_INTEREST: int = 500
 MAX_PREMIUM: Decimal = Decimal("300.00")
 

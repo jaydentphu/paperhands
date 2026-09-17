@@ -41,7 +41,7 @@ def test_dte_above_window() -> None:
 
 
 def test_dte_at_window_edges_is_eligible() -> None:
-    assert evaluate_contract(**_kwargs(dte=14))[0] is True
+    assert evaluate_contract(**_kwargs(dte=28))[0] is True
     assert evaluate_contract(**_kwargs(dte=45))[0] is True
 
 

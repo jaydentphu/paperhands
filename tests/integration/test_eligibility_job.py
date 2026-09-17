@@ -17,8 +17,11 @@ TODAY = dt.date(2026, 9, 16)
 def test_apply_eligibility_produces_a_mix_of_reasons(
     db_session_factory: sessionmaker[Session],
 ) -> None:
+    # GOOGL is the fixed seed/ticker combo that reliably clears the 5%
+    # spread cap for at least one contract - not every ticker does, since
+    # FakeAdapter's spread choices are randomized per (ticker, day).
     gateway = DataGateway(FakeAdapter(today=lambda: TODAY))
-    run_id, results, failed = run_snapshot_job(db_session_factory, gateway, ("NVDA",), TODAY)
+    run_id, results, failed = run_snapshot_job(db_session_factory, gateway, ("GOOGL",), TODAY)
     assert failed == []
     snapshot_id = results[0].snapshot_id
 
