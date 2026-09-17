@@ -46,12 +46,19 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.ruff.lint.per-file-ignores]
 # The system prompt is prose; wrapping its lines would change the prompt.
 "src/agent/prompt.py" = ["E501"]
+# Depends(...)/Query(...) as argument defaults is the standard, correct
+# FastAPI pattern - not the "mutable default" hazard B008 is written for.
+"src/api/main.py" = ["B008"]
 
 [tool.mypy]
 python_version = "3.12"
 mypy_path = "."
 warn_unused_ignores = true
 warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = "apscheduler.*"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

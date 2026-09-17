@@ -10,9 +10,9 @@
   ],
   "start": "2026-03-02",
   "end": "2026-03-31",
-  "tickers": ["AAPL", "MSFT"],
+  "tickers": ["ZTEST1", "ZTEST2"],
   "underlying": {
-    "AAPL": {
+    "ZTEST1": {
       "default": "200.00",
       "overrides": {
         "2026-03-03": "201.00",
@@ -22,7 +22,7 @@
         "2026-03-23": "204.50"
       }
     },
-    "MSFT": {
+    "ZTEST2": {
       "default": "400.00",
       "overrides": {
         "2026-03-05": "399.00",
@@ -35,7 +35,7 @@
   },
   "contracts": [
     {
-      "contract_id": "A1", "ticker": "AAPL", "contract_type": "call", "strike": "200", "expiry": "2026-04-10",
+      "contract_id": "A1", "ticker": "ZTEST1", "contract_type": "call", "strike": "200", "expiry": "2026-04-10",
       "open_interest": 1000,
       "default": {"bid": "2.40", "ask": "2.50"},
       "overrides": {
@@ -45,7 +45,7 @@
       }
     },
     {
-      "contract_id": "A2", "ticker": "AAPL", "contract_type": "call", "strike": "205", "expiry": "2026-04-24",
+      "contract_id": "A2", "ticker": "ZTEST1", "contract_type": "call", "strike": "205", "expiry": "2026-04-24",
       "open_interest": 1000,
       "default": {"bid": "2.30", "ask": "2.40"},
       "overrides": {
@@ -53,7 +53,7 @@
       }
     },
     {
-      "contract_id": "M1", "ticker": "MSFT", "contract_type": "put", "strike": "400", "expiry": "2026-04-10",
+      "contract_id": "M1", "ticker": "ZTEST2", "contract_type": "put", "strike": "400", "expiry": "2026-04-10",
       "open_interest": 1000,
       "default": {"bid": "2.10", "ask": "2.20"},
       "overrides": {
@@ -63,7 +63,7 @@
       }
     },
     {
-      "contract_id": "M2", "ticker": "MSFT", "contract_type": "put", "strike": "400", "expiry": "2026-04-24",
+      "contract_id": "M2", "ticker": "ZTEST2", "contract_type": "put", "strike": "400", "expiry": "2026-04-24",
       "open_interest": 1000,
       "default": {"bid": "2.50", "ask": "2.60"},
       "overrides": {
@@ -73,39 +73,39 @@
     }
   ],
   "decisions": [
-    {"date": "2026-03-02", "cohort": "B", "ticker": "AAPL", "action": "long_call", "contract_id": "A1"},
-    {"date": "2026-03-03", "cohort": "C", "ticker": "AAPL", "action": "long_call", "contract_id": "A1"},
-    {"date": "2026-03-04", "cohort": "B", "ticker": "MSFT", "action": "long_put", "contract_id": "M1"},
-    {"date": "2026-03-05", "cohort": "C", "ticker": "MSFT", "action": "long_put", "contract_id": "M1"},
-    {"date": "2026-03-16", "cohort": "B", "ticker": "AAPL", "action": "long_call", "contract_id": "A2"},
-    {"date": "2026-03-17", "cohort": "C", "ticker": "MSFT", "action": "long_put", "contract_id": "M2"},
-    {"date": "2026-03-20", "cohort": "C", "ticker": "AAPL", "action": "no_trade", "contract_id": null,
+    {"date": "2026-03-02", "cohort": "B", "ticker": "ZTEST1", "action": "long_call", "contract_id": "A1"},
+    {"date": "2026-03-03", "cohort": "C", "ticker": "ZTEST1", "action": "long_call", "contract_id": "A1"},
+    {"date": "2026-03-04", "cohort": "B", "ticker": "ZTEST2", "action": "long_put", "contract_id": "M1"},
+    {"date": "2026-03-05", "cohort": "C", "ticker": "ZTEST2", "action": "long_put", "contract_id": "M1"},
+    {"date": "2026-03-16", "cohort": "B", "ticker": "ZTEST1", "action": "long_call", "contract_id": "A2"},
+    {"date": "2026-03-17", "cohort": "C", "ticker": "ZTEST2", "action": "long_put", "contract_id": "M2"},
+    {"date": "2026-03-20", "cohort": "C", "ticker": "ZTEST1", "action": "no_trade", "contract_id": null,
      "validator_status": "rejected", "rejection_reason": "schema_invalid"},
-    {"date": "2026-03-25", "cohort": "B", "ticker": "MSFT", "action": "long_put", "contract_id": "M2",
+    {"date": "2026-03-25", "cohort": "B", "ticker": "ZTEST2", "action": "long_put", "contract_id": "M2",
      "_note": "accepted decision, but M2's spread that day is 0.30/2.15 = 14% -> fill rejected: spread_too_wide"}
   ],
   "trades": [
-    {"cohort": "B", "ticker": "AAPL", "contract_id": "A1", "opened": "2026-03-02", "closed": "2026-03-09",
+    {"cohort": "B", "ticker": "ZTEST1", "contract_id": "A1", "opened": "2026-03-02", "closed": "2026-03-09",
      "open_price": "2.50", "close_price": "3.30", "underlying_open": "200.00", "underlying_close": "206.00",
      "realized_pnl": "80.00", "direction_correct": true, "horizon_days": 5},
-    {"cohort": "C", "ticker": "AAPL", "contract_id": "A1", "opened": "2026-03-03", "closed": "2026-03-10",
+    {"cohort": "C", "ticker": "ZTEST1", "contract_id": "A1", "opened": "2026-03-03", "closed": "2026-03-10",
      "open_price": "2.70", "close_price": "3.10", "underlying_open": "201.00", "underlying_close": "205.00",
      "realized_pnl": "40.00", "direction_correct": true, "horizon_days": 5},
-    {"cohort": "B", "ticker": "MSFT", "contract_id": "M1", "opened": "2026-03-04", "closed": "2026-03-11",
+    {"cohort": "B", "ticker": "ZTEST2", "contract_id": "M1", "opened": "2026-03-04", "closed": "2026-03-11",
      "open_price": "2.20", "close_price": "1.40", "underlying_open": "400.00", "underlying_close": "404.00",
      "realized_pnl": "-80.00", "direction_correct": false, "horizon_days": 5},
-    {"cohort": "C", "ticker": "MSFT", "contract_id": "M1", "opened": "2026-03-05", "closed": "2026-03-12",
+    {"cohort": "C", "ticker": "ZTEST2", "contract_id": "M1", "opened": "2026-03-05", "closed": "2026-03-12",
      "open_price": "2.30", "close_price": "1.20", "underlying_open": "399.00", "underlying_close": "405.00",
      "realized_pnl": "-110.00", "direction_correct": false, "horizon_days": 5},
-    {"cohort": "B", "ticker": "AAPL", "contract_id": "A2", "opened": "2026-03-16", "closed": "2026-03-23",
+    {"cohort": "B", "ticker": "ZTEST1", "contract_id": "A2", "opened": "2026-03-16", "closed": "2026-03-23",
      "open_price": "2.40", "close_price": "2.50", "underlying_open": "204.00", "underlying_close": "204.50",
      "realized_pnl": "10.00", "direction_correct": true, "horizon_days": 5},
-    {"cohort": "C", "ticker": "MSFT", "contract_id": "M2", "opened": "2026-03-17", "closed": "2026-03-24",
+    {"cohort": "C", "ticker": "ZTEST2", "contract_id": "M2", "opened": "2026-03-17", "closed": "2026-03-24",
      "open_price": "2.60", "close_price": "3.50", "underlying_open": "402.00", "underlying_close": "396.00",
      "realized_pnl": "90.00", "direction_correct": true, "horizon_days": 5}
   ],
   "unfilled": [
-    {"date": "2026-03-25", "cohort": "B", "ticker": "MSFT", "reason": "spread_too_wide"}
+    {"date": "2026-03-25", "cohort": "B", "ticker": "ZTEST2", "reason": "spread_too_wide"}
   ],
   "expected": {
     "A": {

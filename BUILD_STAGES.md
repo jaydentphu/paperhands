@@ -205,7 +205,7 @@ Your job: pick two numbers in the fixture and recompute them by hand. If you can
 
 ## Stage 7: Scheduler and end-to-end daily run
 
-Status: TODO
+Status: DONE
 
 Goal: One command runs the whole pipeline for today. APScheduler runs it at 10:30 ET on trading days and the mark/close job at 16:15 ET.
 

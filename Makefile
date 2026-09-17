@@ -1,4 +1,4 @@
-.PHONY: install check run-daily run-snapshot run-agent robinhood-auth
+.PHONY: install check run-daily run-mark run-snapshot run-agent robinhood-auth
 
 install:
 	pip install -e ".[dev]"
@@ -10,6 +10,9 @@ check:
 
 run-daily:
 	python -m src.scheduler.daily_run
+
+run-mark:
+	python -m src.scheduler.daily_mark
 
 run-snapshot:
 	python -m src.scheduler.snapshot

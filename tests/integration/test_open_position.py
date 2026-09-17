@@ -60,7 +60,7 @@ class StubAdapter:
 def _contract(**overrides: object) -> OptionContract:
     base: dict[str, object] = dict(
         contract_id="c-1",
-        ticker="AAPL",
+        ticker="ZTEST1",
         contract_type=ContractType.CALL,
         strike=Decimal("150"),
         expiry=dt.date(2026, 2, 20),
@@ -75,8 +75,8 @@ def _contract(**overrides: object) -> OptionContract:
 
 
 def _seed_decision(session: Session, **overrides: object) -> Decision:
-    if session.get(WatchlistSymbol, "AAPL") is None:
-        session.add(WatchlistSymbol(ticker="AAPL"))
+    if session.get(WatchlistSymbol, "ZTEST1") is None:
+        session.add(WatchlistSymbol(ticker="ZTEST1"))
     run = Run(run_date=TODAY, status=RunStatus.RUNNING)
     session.add(run)
     session.flush()
@@ -84,7 +84,7 @@ def _seed_decision(session: Session, **overrides: object) -> Decision:
     fields: dict[str, object] = dict(
         run_id=run.id,
         cohort=CohortEnum.C,
-        ticker="AAPL",
+        ticker="ZTEST1",
         action=Action.LONG_CALL,
         contract_id="c-1",
         reasoning={"thesis": "test"},

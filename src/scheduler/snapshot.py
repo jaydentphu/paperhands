@@ -82,18 +82,17 @@ def snapshot_ticker(
     return SnapshotResult(ticker=ticker, snapshot_id=snapshot.id, contracts=stored)
 
 
-def run_snapshot_job(
+def snapshot_all_tickers(
     session_factory: Callable[[], Session],
     gateway: DataGateway,
+    run_id: int,
     tickers: Sequence[str],
     as_of: dt.date,
-) -> tuple[int, list[SnapshotResult], list[str]]:
-    with session_factory() as session:
-        run = Run(run_date=as_of, status=RunStatus.RUNNING)
-        session.add(run)
-        session.commit()
-        run_id = run.id
-
+) -> tuple[list[SnapshotResult], list[str]]:
+    """Snapshots every ticker into an already-created run, one transaction
+    per ticker. Shared by run_snapshot_job (which creates its own run) and
+    daily_run (Stage 7, which creates the run first so eligibility and the
+    cohorts can all reference the same run_id)."""
     results: list[SnapshotResult] = []
     failed: list[str] = []
     for ticker in tickers:
@@ -106,6 +105,22 @@ def run_snapshot_job(
                 session.rollback()
                 logger.exception("snapshot failed for %s", ticker)
                 failed.append(ticker)
+    return results, failed
+
+
+def run_snapshot_job(
+    session_factory: Callable[[], Session],
+    gateway: DataGateway,
+    tickers: Sequence[str],
+    as_of: dt.date,
+) -> tuple[int, list[SnapshotResult], list[str]]:
+    with session_factory() as session:
+        run = Run(run_date=as_of, status=RunStatus.RUNNING)
+        session.add(run)
+        session.commit()
+        run_id = run.id
+
+    results, failed = snapshot_all_tickers(session_factory, gateway, run_id, tickers, as_of)
 
     with session_factory() as session:
         stored_run = session.get(Run, run_id)
