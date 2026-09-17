@@ -10,6 +10,7 @@ import datetime as dt
 from collections.abc import Iterator
 
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -21,6 +22,19 @@ from src.models.db import get_sessionmaker
 from src.models.enums import Cohort, PositionStatus
 
 app = FastAPI(title="Options Research & Evaluation Agent")
+
+# Dashboard has no auth (PRD section 5, out of scope) and is personal/
+# local-only, but the browser still enforces CORS between the Vite dev
+# server (5173) and this API (8000) - and between the built app served
+# by the frontend container (3000) and this API. Scoped to those two
+# known local origins, not a wildcard.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
+
 _sessionmaker = get_sessionmaker()
 
 
