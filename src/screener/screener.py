@@ -12,6 +12,12 @@ one closest to TARGET_DTE, breaking ties by closeness to at-the-money. If
 nothing is within the moneyness cap, the result is no_trade - the strike is
 never allowed to drift OTM just because a cheaper contract happens to
 satisfy the eligibility filter's premium cap.
+
+No trade if earnings falls within the horizon: if a signal fires but
+earnings is scheduled between now and the horizon exit date (inclusive),
+the result is no_trade regardless of direction - deferred from the Stage 4
+strategy review until this stage's trading-day calendar existed to compute
+the horizon exit date correctly (see NOTES.md).
 """
 
 from __future__ import annotations
@@ -20,6 +26,7 @@ import datetime as dt
 from dataclasses import dataclass
 from decimal import Decimal
 
+from src.config import HORIZON_DAYS, add_trading_days
 from src.gateway.types import Bar
 from src.models import ContractSnapshot
 from src.models.enums import Action, ContractType
@@ -49,6 +56,7 @@ def screen(
     eligible_contracts: list[ContractSnapshot],
     spot: Decimal,
     as_of: dt.date,
+    earnings_date: dt.date | None = None,
 ) -> ScreenerDecision:
     ret = twenty_day_return(bars)
     rsi = rsi_14(bars)
@@ -59,6 +67,11 @@ def screen(
         action = Action.LONG_PUT
     else:
         return ScreenerDecision(Action.NO_TRADE, None)
+
+    if earnings_date is not None:
+        horizon_exit = add_trading_days(as_of, HORIZON_DAYS)
+        if as_of <= earnings_date <= horizon_exit:
+            return ScreenerDecision(Action.NO_TRADE, None)
 
     wanted_type = _ACTION_CONTRACT_TYPE[action]
     max_distance = spot * MONEYNESS_CAP_PCT

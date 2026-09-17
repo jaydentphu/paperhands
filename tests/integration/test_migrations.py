@@ -84,6 +84,7 @@ def test_migration_inserts_one_row_per_table(db_session: Session) -> None:
         cohort=Cohort.C,
         decision_id=decision.id,
         contract_id=contract.contract_id,
+        expiry=contract.expiry,
         opened_at=dt.datetime.now(dt.UTC),
         open_price=Decimal("1.20"),
         quantity=1,

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 from decimal import Decimal
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Numeric, String
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
@@ -17,6 +17,12 @@ class PaperPosition(Base):
     cohort: Mapped[Cohort] = mapped_column(Enum(Cohort, name="cohort"), nullable=False)
     decision_id: Mapped[int] = mapped_column(ForeignKey("decisions.id"), nullable=False)
     contract_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    # Not in PRD's literal column list, added in Stage 5: close_positions
+    # needs each position's expiry to check "within 2 trading days of
+    # expiry", and PaperPosition has no other link to it (ContractSnapshot
+    # rows aren't referenced from here - only contract_id). Set once, at
+    # fill time, from the live chain - it never changes after that.
+    expiry: Mapped[dt.date] = mapped_column(Date, nullable=False)
     opened_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     open_price: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default="1")

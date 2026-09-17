@@ -171,7 +171,7 @@ Your job: read the system prompt in prompt.py and the bundle it produced. If the
 
 ## Stage 5: Paper portfolio
 
-Status: TODO
+Status: DONE
 
 Goal: Simulated positions with conservative fills, marks, and closes.
 

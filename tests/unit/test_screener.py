@@ -112,3 +112,34 @@ def test_screen_bullish_signal_but_no_eligible_calls_is_no_trade() -> None:
     result = screen(_bullish_bars(), contracts, Decimal(120), TODAY)
     assert result.action == Action.NO_TRADE
     assert result.contract is None
+
+
+def test_screen_no_trade_when_earnings_falls_within_the_horizon() -> None:
+    # TODAY = Wed 2026-09-16; horizon exit (5 trading days) = Wed 2026-09-23.
+    contracts = [_contract("c-1", ContractType.CALL, Decimal(120), dte=35)]
+    result = screen(
+        _bullish_bars(), contracts, Decimal(120), TODAY, earnings_date=dt.date(2026, 9, 20)
+    )
+    assert result.action == Action.NO_TRADE
+    assert result.contract is None
+
+
+def test_screen_no_trade_when_earnings_is_today() -> None:
+    contracts = [_contract("c-1", ContractType.CALL, Decimal(120), dte=35)]
+    result = screen(_bullish_bars(), contracts, Decimal(120), TODAY, earnings_date=TODAY)
+    assert result.action == Action.NO_TRADE
+
+
+def test_screen_trades_normally_when_earnings_is_after_the_horizon() -> None:
+    contracts = [_contract("c-1", ContractType.CALL, Decimal(120), dte=35)]
+    result = screen(
+        _bullish_bars(), contracts, Decimal(120), TODAY, earnings_date=dt.date(2026, 9, 25)
+    )
+    assert result.action == Action.LONG_CALL
+    assert result.contract is not None
+
+
+def test_screen_trades_normally_when_no_earnings_date_is_known() -> None:
+    contracts = [_contract("c-1", ContractType.CALL, Decimal(120), dte=35)]
+    result = screen(_bullish_bars(), contracts, Decimal(120), TODAY, earnings_date=None)
+    assert result.action == Action.LONG_CALL

@@ -44,8 +44,9 @@ MARK_TIME: dt.time = dt.time(16, 15)
 MARKET_TIMEZONE: str = "America/New_York"
 
 # NYSE holiday calendar, hardcoded per CLAUDE.md conventions (no external
-# calendar library). Observed dates only; trading-day math lives in
-# src/portfolio (Stage 5).
+# calendar library). Observed dates only; trading-day math functions are
+# below (Stage 5) - CLAUDE.md's own conventions section says that math
+# lives here, in config, not in src/portfolio.
 NYSE_HOLIDAYS_2026: frozenset[dt.date] = frozenset(
     {
         dt.date(2026, 1, 1),  # New Year's Day
@@ -81,6 +82,41 @@ NYSE_HOLIDAYS: frozenset[dt.date] = NYSE_HOLIDAYS_2026 | NYSE_HOLIDAYS_2027
 
 def market_today() -> dt.date:
     return dt.datetime.now(ZoneInfo(MARKET_TIMEZONE)).date()
+
+
+def is_trading_day(date: dt.date) -> bool:
+    return date.weekday() < 5 and date not in NYSE_HOLIDAYS
+
+
+def next_trading_day(date: dt.date) -> dt.date:
+    """The next trading day strictly after `date`."""
+    candidate = date + dt.timedelta(days=1)
+    while not is_trading_day(candidate):
+        candidate += dt.timedelta(days=1)
+    return candidate
+
+
+def add_trading_days(start: dt.date, n: int) -> dt.date:
+    """The date reached by stepping forward `n` trading days from `start`.
+    `start` itself is never counted, even when it is itself a trading day."""
+    result = start
+    for _ in range(n):
+        result = next_trading_day(result)
+    return result
+
+
+def trading_days_between(start: dt.date, end: dt.date) -> int:
+    """Number of trading days strictly after `start`, up to and including
+    `end`. Zero if `end` <= `start`. Walks calendar day by day rather than
+    trading-day by trading-day, so it never overshoots a non-trading `end`
+    (e.g. counting a Saturday `end` must not jump past it to Monday)."""
+    count = 0
+    current = start
+    while current < end:
+        current += dt.timedelta(days=1)
+        if is_trading_day(current):
+            count += 1
+    return count
 
 
 class Settings(BaseSettings):
