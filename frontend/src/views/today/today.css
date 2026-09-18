@@ -12,6 +12,14 @@
   gap: var(--s-5);
 }
 
+.today-view__rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  position: sticky;
+  top: 18px;
+}
+
 /* Ticker card (replaces the mockup's hero glass card) */
 .ticker-card {
   position: relative;
@@ -241,8 +249,6 @@
   box-shadow: var(--glass-shadow-secondary);
   overflow: hidden;
   padding: 18px 18px 12px;
-  position: sticky;
-  top: 18px;
 }
 .open-rail__header {
   display: flex;

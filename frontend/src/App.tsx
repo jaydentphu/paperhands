@@ -3,7 +3,7 @@ import { TopBar } from './components/TopBar';
 import { RouterProvider, useRouter } from './router';
 import { LogsView } from './views/LogsView';
 import { PositionsView } from './views/positions/PositionsView';
-import { ScoreboardView } from './views/ScoreboardView';
+import { ScoreboardView } from './views/scoreboard/ScoreboardView';
 import { TodayView } from './views/today/TodayView';
 
 function CurrentView() {

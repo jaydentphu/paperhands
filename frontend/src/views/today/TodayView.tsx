@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { getDecisions, getPositions } from '../../api/client';
 import type { DecisionOut } from '../../api/types';
 import { useFetch } from '../../api/useFetch';
+import { SimulatedNote } from '../../components/SimulatedNote';
 import { OpenPositionsRail } from './OpenPositionsRail';
 import './today.css';
 import { TickerCard } from './TickerCard';
@@ -67,9 +68,12 @@ export function TodayView() {
         <TickerDots tickers={tickers} selected={activeTicker} onSelect={setSelected} />
       </div>
 
-      <OpenPositionsRail
-        positions={positionsState.status === 'ready' ? positionsState.data : []}
-      />
+      <div className="today-view__rail">
+        <OpenPositionsRail
+          positions={positionsState.status === 'ready' ? positionsState.data : []}
+        />
+        <SimulatedNote />
+      </div>
     </div>
   );
 }

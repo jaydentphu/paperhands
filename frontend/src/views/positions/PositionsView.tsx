@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { getPositions } from '../../api/client';
 import { useFetch } from '../../api/useFetch';
+import { SimulatedNote } from '../../components/SimulatedNote';
 import { PositionRow } from './PositionRow';
 import './positions.css';
 
@@ -81,6 +82,7 @@ export function PositionsView() {
       </div>
 
       <div className="t-label positions-view__footer">Rows shown: {rows.length}</div>
+      <SimulatedNote />
     </div>
   );
 }

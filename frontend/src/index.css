@@ -213,6 +213,17 @@ a:hover {
   flex: 1;
 }
 
+/* PRD.md section 9 honesty label - shared by every view with a $ figure */
+.simulated-note {
+  padding: 14px 18px;
+  border-radius: var(--r-panel);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 /* Placeholder views (Stage 8a only - real content built per-view in 8b) */
 .view-placeholder {
   border-radius: var(--r-card);
