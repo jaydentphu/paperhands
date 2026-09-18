@@ -1,7 +1,7 @@
 import { NavTabs } from './components/NavTabs';
 import { TopBar } from './components/TopBar';
 import { RouterProvider, useRouter } from './router';
-import { LogsView } from './views/LogsView';
+import { LogsView } from './views/logs/LogsView';
 import { PositionsView } from './views/positions/PositionsView';
 import { ScoreboardView } from './views/scoreboard/ScoreboardView';
 import { TodayView } from './views/today/TodayView';
