@@ -263,7 +263,7 @@ Done when:
 
 ## Stage 9: CI hardening and docs
 
-Status: TODO
+Status: DONE - except done-when item 2, which is Jayden's: read README.md and confirm every sentence. Audit findings (no violations, three observations) are in NOTES.md under "Stage 9".
 
 Prompt:
 ```

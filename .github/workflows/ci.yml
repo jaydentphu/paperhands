@@ -5,8 +5,49 @@ on:
     branches: [main]
   pull_request:
 
+# src/config.py's Settings has a default for every one of these, so no job
+# strictly needs them - they are set so every job imports src identically.
+# None is a real credential.
+env:
+  DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/options_agent
+  ANTHROPIC_API_KEY: test-key-not-real
+  RUNTIME_MODEL: claude-sonnet-5
+  ADAPTER: robinhood
+
 jobs:
-  check:
+  lint:
+    name: ruff + mypy --strict
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: make install
+      - name: ruff
+        run: python -m ruff check .
+      - name: mypy --strict
+        run: python -m mypy --strict src
+
+  unit:
+    name: pytest unit
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: make install
+      - run: python -m pytest tests/unit
+
+  integration:
+    name: pytest integration (Postgres)
+    needs: lint
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -23,19 +64,58 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/options_agent
-      ANTHROPIC_API_KEY: test-key-not-real
-      RUNTIME_MODEL: claude-sonnet-5
-      ADAPTER: robinhood
+      # conftest.py skips the whole suite when Postgres is unreachable. Here
+      # that would be a broken service showing as a green check, so fail.
+      REQUIRE_POSTGRES: "1"
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: make install
+      - run: python -m pytest tests/integration
 
-      - name: Install dependencies
-        run: make install
+  # Its own job on purpose: the safety property gets its own named check on
+  # every commit, independent of everything else passing or failing.
+  capability-boundary:
+    name: capability boundary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: make install
+      - run: python -m pytest tests/test_capability_boundary.py -v -s
 
-      - name: Run checks
-        run: make check
+  docker-build:
+    name: docker compose build
+    needs: [unit, integration]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # docker-compose.yml declares env_file: .env for api and worker, and
+      # compose refuses to load a project whose env_file is missing. The
+      # example file has placeholders only.
+      - run: cp .env.example .env
+      - run: docker compose build
+
+  frontend:
+    name: npm run build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build

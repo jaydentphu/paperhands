@@ -30,7 +30,13 @@ def _postgres_reachable() -> bool:
 @pytest.fixture(scope="session")
 def migrated_engine() -> Iterator[sa.Engine]:
     if not _postgres_reachable():
-        pytest.skip(f"Postgres not reachable at {DATABASE_URL}")
+        message = f"Postgres not reachable at {DATABASE_URL}"
+        # Skipping is right on a laptop with Docker down. In CI the service
+        # is supposed to be there, and a skip would turn a broken service
+        # into a green check - so CI sets REQUIRE_POSTGRES=1 and fails.
+        if os.environ.get("REQUIRE_POSTGRES") == "1":
+            pytest.fail(f"{message} (REQUIRE_POSTGRES=1, refusing to skip)")
+        pytest.skip(message)
     cfg = Config("alembic.ini")
     cfg.set_main_option("sqlalchemy.url", DATABASE_URL)
     command.upgrade(cfg, "head")
