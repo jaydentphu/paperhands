@@ -83,7 +83,7 @@ docker compose up -d            # api on :8000, worker on the schedule below,
 cd frontend && npm install && npm run dev    # dashboard on :5173 during development
 ```
 
-The worker runs the daily job at 10:30 ET and the mark/close job at 16:15 ET, on trading days only. The API is read-only; its endpoints are `/runs/latest`, `/decisions`, `/positions`, `/metrics`, and `/logs`. (As of this writing the frontend container's Dockerfile still needs its build stage - see Stage 8 in `BUILD_STAGES.md`; use `npm run dev` to view the dashboard.)
+The worker runs the daily job at 10:30 ET and the mark/close job at 16:15 ET, on trading days only. The API is read-only; its endpoints are `/runs/latest`, `/decisions`, `/positions`, `/metrics`, and `/logs`. The frontend container builds the dashboard in a Node stage and serves the static output from nginx, with a fallback to `index.html` so the app's own routes survive a refresh.
 
 `make check` runs everything CI runs: `ruff`, `mypy --strict`, and `pytest`. The integration tests need the compose Postgres up and skip cleanly if it is not; the one live-broker test is opt-in with `ROBINHOOD_LIVE_TESTS=1`.
 

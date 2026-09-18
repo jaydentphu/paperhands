@@ -225,7 +225,7 @@ STOP HERE. Before Stage 8, Jayden adds the Claude Design exports to docs/design/
 
 ## Stage 8: Dashboard (Claude Code builds, Jayden reviews every file)
 
-Status: IN PROGRESS - all four views built (8a + 8b Today/Positions/Scoreboard/Logs), blocked on one Done-when item: frontend/Dockerfile (Jayden's, per CLAUDE.md rule 8) only copies the raw index.html, not a built app - see the bottom of this section.
+Status: DONE - except done-when item 5, which is Jayden's: explain types.ts, client.ts, and one full view component without notes. frontend/Dockerfile was written by Claude Code at Jayden's explicit request (a waiver of CLAUDE.md rule 8, recorded in NOTES.md).
 
 Goal: React + TypeScript + Vite app with four views reading from the five API endpoints, matching the design in docs/design/.
 
@@ -257,7 +257,7 @@ Open docs/design/Paperhands.dc.html to the <NAME> tab and compare it to the runn
 Done when:
 - All four views render real data from the running API. ✓ verified live against the real API for all four.
 - npm run build succeeds with zero TypeScript errors under strict mode. ✓
-- The frontend container serves the built app. ✗ NOT MET - `docker compose build frontend && docker compose up -d frontend` then `curl http://localhost:3000/` returns the raw Vite dev-time index.html (`<script type="module" src="/src/main.tsx">`), not a built app - nginx never gets `dist/`. `frontend/Dockerfile` is currently just `FROM nginx:alpine` + `COPY index.html ...`, no `npm run build` stage. This is Jayden's file (CLAUDE.md rule 8), needs a multi-stage build (a `node` stage running `npm ci && npm run build`, then copy that stage's `dist/` into the nginx stage) - ask Claude Code to review once written.
+- The frontend container serves the built app. ✓ verified: `curl http://localhost:3000/` returns the built index.html referencing the hashed `/assets/index-*.js` bundle (same hash as a local `npm run build`), the bundle itself is served with `application/javascript`, and `/positions` returns `index.html` with a 200 (nginx `try_files` fallback for client-side routes). Image is 94 MB: nginx plus `dist/`, no Node.
 - Every view shows the "Simulated results, conservative fills" label where P&L appears. ✓
 - Jayden can explain types.ts, client.ts, and one full view component without notes.
 
