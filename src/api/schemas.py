@@ -38,6 +38,7 @@ class PositionOut(BaseModel):
     id: int
     cohort: str
     decision_id: int
+    ticker: str
     contract_id: str
     expiry: dt.date
     opened_at: dt.datetime
@@ -50,6 +51,9 @@ class PositionOut(BaseModel):
     closed_at: dt.datetime | None
     close_price: str | None
     close_reason: str | None
+    mark_price: str | None
+    unrealized_pnl: str | None
+    realized_pnl: str | None
 
 
 class MetricsOut(BaseModel):

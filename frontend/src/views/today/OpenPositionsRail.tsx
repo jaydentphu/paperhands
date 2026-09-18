@@ -1,10 +1,14 @@
 import type { PositionOut } from '../../api/types';
-import { COHORT_TAG } from './cohort';
+import { COHORT_TAG } from '../../lib/cohort';
+
+function pnlClass(value: string | null): string {
+  if (value === null) return '';
+  return value.startsWith('-') ? 'open-rail__pnl--loss' : 'open-rail__pnl--gain';
+}
 
 /** Sticky right-rail summary of every currently open paper position, across
- * tickers and cohorts - matches the mockup's rail, minus a live mark price
- * (no mark endpoint exists yet, see NOTES.md), so this shows entry price
- * and open date instead of unrealized P&L. */
+ * tickers and cohorts. Unrealized P&L comes from the latest daily `Mark`
+ * (see NOTES.md) - null until the next mark job runs for a same-day fill. */
 export function OpenPositionsRail({ positions }: { positions: PositionOut[] }) {
   return (
     <div className="open-rail">
@@ -21,14 +25,20 @@ export function OpenPositionsRail({ positions }: { positions: PositionOut[] }) {
             <div key={p.id} className="open-rail__row">
               <div className="open-rail__tag">{COHORT_TAG[p.cohort]}</div>
               <div className="open-rail__meta">
-                <div className="t-row open-rail__contract" title={p.contract_id}>
-                  {p.contract_id}
+                <div className="t-row" title={p.contract_id}>
+                  {p.ticker}
                 </div>
                 <div className="t-label open-rail__sub">
                   Opened {new Date(p.opened_at).toLocaleDateString()}
                 </div>
               </div>
-              <div className="t-row num">${p.open_price}</div>
+              {p.unrealized_pnl !== null ? (
+                <div className={`t-row num ${pnlClass(p.unrealized_pnl)}`}>
+                  ${p.unrealized_pnl}
+                </div>
+              ) : (
+                <div className="t-row num">${p.open_price}</div>
+              )}
             </div>
           ))}
         </div>

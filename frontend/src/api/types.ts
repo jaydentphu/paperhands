@@ -44,6 +44,7 @@ export interface PositionOut {
   id: number;
   cohort: Cohort;
   decision_id: number;
+  ticker: string;
   contract_id: string;
   expiry: string;
   opened_at: string;
@@ -56,6 +57,9 @@ export interface PositionOut {
   closed_at: string | null;
   close_price: string | null;
   close_reason: CloseReason | null;
+  mark_price: string | null;
+  unrealized_pnl: string | null;
+  realized_pnl: string | null;
 }
 
 export interface MetricsOut {

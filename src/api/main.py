@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import datetime as dt
 from collections.abc import Iterator
+from decimal import Decimal
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,7 +18,8 @@ from sqlalchemy.orm import Session
 from src.api.schemas import DecisionOut, LogOut, MetricsOut, PositionOut, RunOut
 from src.config import market_today
 from src.evaluator import CohortMetrics, cohort_metrics
-from src.models import Decision, PaperPosition, Run, RunLog
+from src.evaluator.evaluate import CONTRACT_MULTIPLIER
+from src.models import Decision, Evaluation, Mark, PaperPosition, Run, RunLog
 from src.models.db import get_sessionmaker
 from src.models.enums import Cohort, PositionStatus
 
@@ -74,11 +76,23 @@ def _decision_out(d: Decision) -> DecisionOut:
     )
 
 
-def _position_out(p: PaperPosition) -> PositionOut:
+def _unrealized_pnl(position: PaperPosition, mark_price: Decimal | None) -> Decimal | None:
+    """Same formula as evaluate_position's realized case, applied to a
+    still-open position's latest recorded Mark instead of its close_price."""
+    if position.status != PositionStatus.OPEN or mark_price is None:
+        return None
+    return (mark_price - position.open_price) * CONTRACT_MULTIPLIER * position.quantity
+
+
+def _position_out(
+    p: PaperPosition, ticker: str, mark_price: Decimal | None, realized_pnl: Decimal | None
+) -> PositionOut:
+    unrealized = _unrealized_pnl(p, mark_price)
     return PositionOut(
         id=p.id,
         cohort=p.cohort.value,
         decision_id=p.decision_id,
+        ticker=ticker,
         contract_id=p.contract_id,
         expiry=p.expiry,
         opened_at=p.opened_at,
@@ -91,6 +105,9 @@ def _position_out(p: PaperPosition) -> PositionOut:
         closed_at=p.closed_at,
         close_price=str(p.close_price) if p.close_price is not None else None,
         close_reason=p.close_reason.value if p.close_reason is not None else None,
+        mark_price=str(mark_price) if mark_price is not None else None,
+        unrealized_pnl=str(unrealized) if unrealized is not None else None,
+        realized_pnl=str(realized_pnl) if realized_pnl is not None else None,
     )
 
 
@@ -151,10 +168,24 @@ def list_decisions(
 def list_positions(
     status: PositionStatus | None = Query(default=None), db: Session = Depends(get_db)
 ) -> list[PositionOut]:
-    stmt = select(PaperPosition).order_by(PaperPosition.opened_at.desc())
+    latest_mark = (
+        select(Mark.bid)
+        .where(Mark.position_id == PaperPosition.id)
+        .order_by(Mark.mark_date.desc())
+        .limit(1)
+        .correlate(PaperPosition)
+        .scalar_subquery()
+    )
+    stmt = (
+        select(PaperPosition, Decision.ticker, latest_mark, Evaluation.realized_pnl)
+        .join(Decision, Decision.id == PaperPosition.decision_id)
+        .outerjoin(Evaluation, Evaluation.position_id == PaperPosition.id)
+        .order_by(PaperPosition.opened_at.desc())
+    )
     if status is not None:
         stmt = stmt.where(PaperPosition.status == status)
-    return [_position_out(p) for p in db.scalars(stmt).all()]
+    rows = db.execute(stmt).all()
+    return [_position_out(p, ticker, mark, pnl) for p, ticker, mark, pnl in rows]
 
 
 @app.get("/metrics", response_model=list[MetricsOut])

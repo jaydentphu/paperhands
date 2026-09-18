@@ -1,4 +1,4 @@
-import type { Action, Cohort } from '../../api/types';
+import type { Action, Cohort } from '../api/types';
 
 export const COHORT_NAME: Record<Cohort, string> = {
   A: 'Cash',
@@ -16,6 +16,12 @@ export const COHORT_TAG: Record<Cohort, string> = {
   A: 'CSH',
   B: 'SCR',
   C: 'AGT',
+};
+
+export const COHORT_COLOR_VAR: Record<Cohort, string> = {
+  A: 'var(--cash)',
+  B: 'var(--sage)',
+  C: 'var(--accent)',
 };
 
 export const ACTION_LABEL: Record<Action, string> = {

@@ -291,3 +291,9 @@
   color: var(--text-faint);
   margin-top: 1px;
 }
+.open-rail__pnl--gain {
+  color: var(--gain);
+}
+.open-rail__pnl--loss {
+  color: var(--loss);
+}

@@ -1,5 +1,5 @@
 import type { DecisionOut } from '../../api/types';
-import { ACTION_LABEL, actionColorVar, COHORT_NAME, COHORT_SUB, COHORT_TAG } from './cohort';
+import { ACTION_LABEL, actionColorVar, COHORT_NAME, COHORT_SUB, COHORT_TAG } from '../../lib/cohort';
 
 /** One cohort's decision for the selected ticker: action pill, contract,
  * confidence (Agent only - Cash/Screener are deterministic), and the
