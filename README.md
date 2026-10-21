@@ -8,6 +8,12 @@ Every trading day it pulls live quotes, option chains, an earnings date, and hea
 
 It is an experiment and a learning tool. It is not expected to be profitable, and a negative result is a valid outcome. It never places a real order, and it is built so that it cannot.
 
+## Architecture
+
+![Architecture diagram. The top row shows the capability boundary: the Robinhood MCP with 73 tools, a transport allowlist of 7 read-only tools, a gateway allowlist of 5 functions, then the research agent. The bottom row shows the daily pipeline from snapshot to dashboard.](docs/architecture.svg)
+
+The top row is [the capability boundary](#the-capability-boundary); the bottom row is the [daily pipeline](#pipeline).
+
 ## The three cohorts
 
 All three see the same data on the same day and each produces one decision per ticker. A is the benchmark, B is the control, C is the hypothesis under test.
